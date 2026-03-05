@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Mario: Gravity Chaos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <header>
+            <h1>GRAVITY <span>CHAOS</span></h1>
+            <div id="hud">
+                <div class="stat">COINS: <span id="coin-count">00</span></div>
+                <div class="stat">SCORE: <span id="score">000000</span></div>
+                <div class="stat">GRAVITY: <span id="gravity-status">NORMAL</span></div>
+            </div>
+        </header>
+
+        <main>
+            <canvas id="game-canvas" width="800" height="600"></canvas>
+            
+            <div id="overlay">
+                <div id="start-screen" class="screen">
+                    <h2>WELCOME TO THE CHAOS</h2>
+                    <p>Gravity is failing. Can you survive the Mushroom Kingdom's glitch?</p>
+                    <button id="start-btn" class="pixel-btn">START GAME</button>
+                    <div class="controls-hint">
+                        <span>[A/D/ARROWS] Move</span>
+                        <span>[W/SPACE] Jump</span>
+                    </div>
+                </div>
+
+                <div id="game-over-screen" class="screen hidden">
+                    <h2>CHAOS RECLAIMED</h2>
+                    <p>Your scores: <span id="final-score">0</span></p>
+                    <button id="restart-btn" class="pixel-btn">RETRY</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Built with Antigravity Engine | Precision Platformer</p>
+        </footer>
+    </div>
+
+    <script src="src/game.js" type="module"></script>
+</body>
+</html>

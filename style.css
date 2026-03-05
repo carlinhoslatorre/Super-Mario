@@ -1,0 +1,179 @@
+:root {
+    --primary-color: #ff3e3e; /* Mario Red */
+    --secondary-color: #2e2e2e;
+    --accent-color: #ff9900; /* Star power */
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --font-heading: 'Press Start 2P', cursive;
+    --font-ui: 'Outfit', sans-serif;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-ui);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+#game-container {
+    width: 800px;
+    height: 720px; /* Header (60px) + Main (600px) + Footer (60px) */
+    display: flex;
+    flex-direction: column;
+    border: 4px solid var(--primary-color);
+    box-shadow: 0 0 30px rgba(255, 62, 62, 0.3);
+    background-color: #000;
+}
+
+header {
+    height: 80px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--glass-border);
+    background: linear-gradient(to right, #2a2a2a, #1a1a1a);
+}
+
+header h1 {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    color: var(--primary-color);
+    letter-spacing: 2px;
+}
+
+header h1 span {
+    color: var(--accent-color);
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+#hud {
+    display: flex;
+    gap: 30px;
+}
+
+.stat {
+    font-family: var(--font-heading);
+    font-size: 10px;
+    color: var(--text-color);
+    text-shadow: 2px 2px 0px #000;
+}
+
+main {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    background-color: #000;
+}
+
+#game-canvas {
+    display: block;
+    image-rendering: pixelated; /* Essential for pixel art */
+    background: linear-gradient(to bottom, #5c94fc, #9290ff); /* Classic Mario sky */
+}
+
+#overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+}
+
+.screen {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.screen.hidden {
+    display: none;
+}
+
+h2 {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    color: var(--primary-color);
+    text-shadow: 4px 4px 0px #333;
+}
+
+p {
+    font-size: 18px;
+    color: #999;
+    max-width: 400px;
+}
+
+.pixel-btn {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    padding: 15px 30px;
+    border: none;
+    background-color: var(--primary-color);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 4px 4px 0px #850000;
+    transition: transform 0.1s;
+    outline: none;
+    border-radius: 4px;
+}
+
+.pixel-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #850000;
+    background-color: #ff5e5e;
+}
+
+.pixel-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px #850000;
+}
+
+.controls-hint {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+    color: #555;
+    text-transform: uppercase;
+}
+
+footer {
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1a1a1a;
+    border-top: 1px solid var(--glass-border);
+}
+
+footer p {
+    font-size: 10px;
+    color: #666;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
