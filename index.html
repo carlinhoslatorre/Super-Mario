@@ -1,46 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Mario: Gravity Chaos</title>
+    <title>Mario Gravity Chaos</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Press+Start+2P&display=swap"
-        rel="stylesheet">
 </head>
 
 <body>
     <div id="game-container">
-        <header>
-            <h1>MARIO GRAVITY</h1>
-            <div id="hud">
-                <div class="stat">COINS: <span id="coin-count">00</span></div>
-                <div class="stat">SCORE: <span id="score">000000</span></div>
-                <div class="stat">MODE: <span id="gravity-status">NORMAL</span></div>
+        <div id="overlay">
+            <div id="start-screen">
+                <h1 style="margin-bottom:20px; color:#ff3e3e;">MARIO GRAVITY</h1>
+                <p style="margin-bottom:30px;">Arrows/WASD to Move<br>Space/W to Jump</p>
+                <button id="start-btn" class="pixel-btn">START GAME</button>
             </div>
-        </header>
-
-        <main>
-            <canvas id="game-canvas"></canvas>
-
-            <div id="overlay">
-                <div id="start-screen" class="screen">
-                    <h2 style="font-family:'Press Start 2P';color:#ff3e3e;">READY?</h2>
-                    <p style="color:#aaa;">Use ARROWS or WASD to move.<br>SPACE to jump.</p>
-                    <button id="start-btn" class="pixel-btn">START GAME</button>
-                </div>
-            </div>
-        </main>
-
-        <footer>
-            <p>Built with Antigravity Engine</p>
-        </footer>
+        </div>
+        <canvas id="game-canvas"></canvas>
     </div>
-
-    <!-- Script at the end, no module for maximum local compatibility -->
     <script src="src/game.js"></script>
 </body>
 
