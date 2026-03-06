@@ -15,42 +15,32 @@
 <body>
     <div id="game-container">
         <header>
-            <h1>GRAVITY <span>CHAOS</span></h1>
+            <h1>MARIO GRAVITY</h1>
             <div id="hud">
                 <div class="stat">COINS: <span id="coin-count">00</span></div>
                 <div class="stat">SCORE: <span id="score">000000</span></div>
-                <div class="stat">GRAVITY: <span id="gravity-status">NORMAL</span></div>
+                <div class="stat">MODE: <span id="gravity-status">NORMAL</span></div>
             </div>
         </header>
 
         <main>
-            <canvas id="game-canvas" width="800" height="600"></canvas>
+            <canvas id="game-canvas"></canvas>
 
             <div id="overlay">
                 <div id="start-screen" class="screen">
-                    <h2>MARIO: GRAVITY CHAOS</h2>
-                    <p>Use WASD or Arrows to move. Space to jump.</p>
-                    <button id="start-btn" class="pixel-btn">CLICK TO START</button>
-                    <div class="controls-hint">
-                        <span>[A/D/ARROWS] Move</span>
-                        <span>[SPACE/W] Jump</span>
-                    </div>
-                </div>
-
-                <div id="game-over-screen" class="screen hidden">
-                    <h2>GAME OVER</h2>
-                    <p>Total Score: <span id="final-score">0</span></p>
-                    <button id="restart-btn" class="pixel-btn">RETRY</button>
+                    <h2 style="font-family:'Press Start 2P';color:#ff3e3e;">READY?</h2>
+                    <p style="color:#aaa;">Use ARROWS or WASD to move.<br>SPACE to jump.</p>
+                    <button id="start-btn" class="pixel-btn">START GAME</button>
                 </div>
             </div>
         </main>
 
         <footer>
-            <p>Built with Antigravity Engine | Precision Platformer</p>
+            <p>Built with Antigravity Engine</p>
         </footer>
     </div>
 
-    <!-- Removed module type for better control and event handling -->
+    <!-- Script at the end, no module for maximum local compatibility -->
     <script src="src/game.js"></script>
 </body>
 

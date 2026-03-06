@@ -32,6 +32,7 @@ body {
     flex-direction: column;
     border: 4px solid var(--primary-color);
     background-color: #000;
+    position: relative;
 }
 
 header {
@@ -71,17 +72,20 @@ main {
     height: 600px;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
-    image-rendering: -moz-crisp-edges;
 }
 
 #overlay {
     position: absolute;
-    inset: 0;
+    top: 80px;
+    /* Below header */
+    left: 0;
+    width: 100%;
+    height: 600px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 999;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
 }
 
 .screen {
@@ -89,31 +93,32 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-}
-
-/* --- THE FIX FOR PERSISTENCE --- */
-.hidden {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+    gap: 30px;
 }
 
 .pixel-btn {
     font-family: var(--font-heading);
-    font-size: 14px;
-    padding: 15px 30px;
-    border: none;
+    font-size: 22px;
+    padding: 25px 50px;
+    border: 4px solid #fff;
     background-color: var(--primary-color);
     color: #fff;
     cursor: pointer;
-    box-shadow: 4px 4px 0px #850000;
+    box-shadow: 10px 10px 0px #000;
+    transition: transform 0.05s;
 }
 
 .pixel-btn:hover {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0px #850000;
+    background-color: #ff5e5e;
+}
+
+.pixel-btn:active {
+    transform: translate(5px, 5px);
+    box-shadow: 5px 5px 0px #000;
+}
+
+.hidden {
+    display: none !important;
 }
 
 footer {
