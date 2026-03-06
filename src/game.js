@@ -91,19 +91,31 @@ class Game {
             if (this.keys[e.code]) this.keys[e.code] = false;
         });
 
-        document.getElementById('start-btn').onclick = () => {
-            document.getElementById('overlay').classList.add('hidden');
+        document.getElementById('start-btn').onclick = (e) => {
+            console.log("Start Button Clicked");
+            e.stopPropagation();
             this.isPaused = false;
-            this.resetLevel(); // Reset at start to be sure
+            this.isGameOver = false;
+            this.resetLevel();
+            const overlay = document.getElementById('overlay');
+            const startScreen = document.getElementById('start-screen');
+            overlay.style.display = 'none';
+            overlay.classList.add('hidden');
+            startScreen.classList.add('hidden');
             window.focus();
         };
 
-        document.getElementById('restart-btn').onclick = () => {
-            this.resetLevel();
-            document.getElementById('game-over-screen').classList.add('hidden');
-            document.getElementById('overlay').classList.add('hidden');
-            this.isGameOver = false;
+        document.getElementById('restart-btn').onclick = (e) => {
+            console.log("Restart Button Clicked");
+            e.stopPropagation();
             this.isPaused = false;
+            this.isGameOver = false;
+            this.resetLevel();
+            const overlay = document.getElementById('overlay');
+            const gameOverScreen = document.getElementById('game-over-screen');
+            overlay.style.display = 'none';
+            overlay.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
             window.focus();
         };
     }
@@ -254,8 +266,11 @@ class Game {
         if (this.invincibleTimer > 0) return;
         this.isGameOver = true;
         document.getElementById('final-score').innerText = this.score;
-        document.getElementById('game-over-screen').classList.remove('hidden');
-        document.getElementById('overlay').classList.remove('hidden');
+        const overlay = document.getElementById('overlay');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        overlay.style.display = 'flex';
+        overlay.classList.remove('hidden');
+        gameOverScreen.classList.remove('hidden');
     }
 
     gameLoop() {
@@ -380,20 +395,30 @@ class Player extends Entity {
     update() {
         this.onGround = false;
 
-        // Input
+        let moveX = 0;
         if (this.game.keys['ArrowLeft'] || this.game.keys['KeyA']) {
-            this.vx = -CONFIG.walkSpeed;
+            moveX = -1;
             this.facing = -1;
-            this.state = 'walk';
         } else if (this.game.keys['ArrowRight'] || this.game.keys['KeyD']) {
-            this.vx = CONFIG.walkSpeed;
+            moveX = 1;
             this.facing = 1;
+        }
+
+        // Mario Physics: Acceleration and Friction
+        const accel = 0.5;
+        const friction = 0.9;
+
+        if (moveX !== 0) {
+            this.vx += moveX * accel;
             this.state = 'walk';
         } else {
-            this.vx *= 0.8;
-            if (Math.abs(this.vx) < 0.1) this.vx = 0;
+            this.vx *= friction;
+            if (Math.abs(this.vx) < 0.2) this.vx = 0;
             this.state = 'idle';
         }
+
+        // Max Speed
+        if (Math.abs(this.vx) > CONFIG.walkSpeed) this.vx = CONFIG.walkSpeed * Math.sign(this.vx);
 
         if ((this.game.keys['ArrowUp'] || this.game.keys['KeyW'] || this.game.keys['Space']) && this.onGround) {
             this.vy = CONFIG.jumpForce * this.game.gravityDir;
@@ -409,8 +434,8 @@ class Player extends Entity {
 
         if (!this.onGround) this.state = 'jump';
 
-        // Animation
-        this.animFrame += 0.15;
+        // Animation speed based on velocity
+        this.animFrame += Math.abs(this.vx) * 0.05 + 0.05;
     }
 
     draw(ctx) {

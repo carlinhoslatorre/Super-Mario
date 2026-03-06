@@ -110,8 +110,8 @@ main {
     animation: fadeIn 0.5s ease-out;
 }
 
-.screen.hidden {
-    display: none;
+.hidden {
+    display: none !important;
 }
 
 h2 {
