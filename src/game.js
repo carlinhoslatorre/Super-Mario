@@ -81,16 +81,21 @@ class Game {
 
     setupEventListeners() {
         window.addEventListener('keydown', (e) => {
-            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'KeyA', 'KeyD', 'KeyW', 'KeyS'].includes(e.code)) {
+            const gameKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'KeyA', 'KeyD', 'KeyW', 'KeyS'];
+            if (gameKeys.includes(e.code)) {
                 e.preventDefault();
+                this.keys[e.code] = true;
             }
-            this.keys[e.code] = true;
         });
-        window.addEventListener('keyup', (e) => this.keys[e.code] = false);
+        window.addEventListener('keyup', (e) => {
+            if (this.keys[e.code]) this.keys[e.code] = false;
+        });
 
         document.getElementById('start-btn').onclick = () => {
             document.getElementById('overlay').classList.add('hidden');
             this.isPaused = false;
+            this.resetLevel(); // Reset at start to be sure
+            window.focus();
         };
 
         document.getElementById('restart-btn').onclick = () => {
@@ -99,6 +104,7 @@ class Game {
             document.getElementById('overlay').classList.add('hidden');
             this.isGameOver = false;
             this.isPaused = false;
+            window.focus();
         };
     }
 
@@ -130,8 +136,8 @@ class Game {
         this.hiddenBlocks = [];
         this.fallingPlatforms = [];
 
-        this.player = new Player(100, 150, this);
-        this.invincibleTimer = 120; // 2 seconds safety
+        this.player = new Player(100, 100, this);
+        this.invincibleTimer = 300; // 5 seconds of total safety for testing
         this.entities = [
             new Enemy(800, 320, this),
             new Enemy(1400, 320, this),
@@ -141,7 +147,13 @@ class Game {
 
     update() {
         if (this.isPaused || this.isGameOver) return;
-        if (this.invincibleTimer > 0) this.invincibleTimer--;
+        if (this.invincibleTimer > 0) {
+            this.invincibleTimer--;
+            // Blinking effect
+            this.player.alpha = (this.invincibleTimer % 20 > 10) ? 0.5 : 1.0;
+        } else {
+            this.player.alpha = 1.0;
+        }
 
         // Gravity flip timer logic
         if (this.isGravityFlipped) {
@@ -178,10 +190,16 @@ class Game {
     }
 
     draw() {
+        // Redraw check to prevent blurring
+        this.ctx.imageSmoothingEnabled = false;
+        this.ctx.mozImageSmoothingEnabled = false;
+        this.ctx.webkitImageSmoothingEnabled = false;
+        this.ctx.msImageSmoothingEnabled = false;
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw Background (parallax-ish)
-        const bgX = -(this.camera.x * 0.3) % 800;
+        // Draw Background (integer coords to avoid blur)
+        const bgX = Math.floor(-(this.camera.x * 0.3) % 800);
         this.ctx.drawImage(this.images.bg, bgX, 0);
         this.ctx.drawImage(this.images.bg, bgX + 800, 0);
 
@@ -400,7 +418,8 @@ class Player extends Entity {
         const frame = Math.floor(this.animFrame) % sprite.frames;
 
         ctx.save();
-        ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
+        ctx.globalAlpha = this.alpha || 1.0;
+        ctx.translate(Math.floor(this.x + this.w / 2), Math.floor(this.y + this.h / 2));
         if (this.facing === -1) ctx.scale(-1, 1);
         if (this.game.gravityDir === -1) ctx.scale(1, -1);
 
