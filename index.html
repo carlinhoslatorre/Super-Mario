@@ -4,21 +4,85 @@
 <head>
     <meta charset="UTF-8">
     <title>Mario Gravity Chaos</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #start-btn {
+            padding: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        canvas {
+            border: 2px solid #ff0000;
+            background: #5c94fc;
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="game-container">
-        <div id="overlay">
-            <div id="start-screen">
-                <h1 style="margin-bottom:20px; color:#ff3e3e;">MARIO GRAVITY</h1>
-                <p style="margin-bottom:30px;">Arrows/WASD to Move<br>Space/W to Jump</p>
-                <button id="start-btn" class="pixel-btn">START GAME</button>
-            </div>
-        </div>
-        <canvas id="game-canvas"></canvas>
-    </div>
-    <script src="src/game.js"></script>
+    <button id="start-btn">CLIQUE PARA JOGAR (START)</button>
+    <canvas id="game-canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const btn = document.getElementById('start-btn');
+
+        canvas.width = 800;
+        canvas.height = 600;
+
+        let player = { x: 100, y: 500, vx: 0, vy: 0, w: 32, h: 32 };
+        let gravity = 0.5;
+        let keys = {};
+
+        window.onkeydown = (e) => keys[e.code] = true;
+        window.onkeyup = (e) => keys[e.code] = false;
+
+        btn.onclick = () => {
+            btn.style.display = 'none';
+            canvas.style.display = 'block';
+            gameLoop();
+        };
+
+        function gameLoop() {
+            // Physics
+            if (keys['ArrowLeft'] || keys['KeyA']) player.vx = -5;
+            else if (keys['ArrowRight'] || keys['KeyD']) player.vx = 5;
+            else player.vx = 0;
+
+            if ((keys['ArrowUp'] || keys['KeyW'] || keys['Space']) && player.y >= 500) {
+                player.vy = -12;
+            }
+
+            player.y += player.vy;
+            player.x += player.vx;
+
+            if (player.y < 500) player.vy += gravity;
+            else { player.y = 500; player.vy = 0; }
+
+            // Draw
+            ctx.fillStyle = '#5c94fc';
+            ctx.fillRect(0, 0, 800, 600);
+
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, 532, 800, 68);
+
+            ctx.fillStyle = 'red';
+            ctx.fillRect(player.x, player.y, player.w, player.h);
+
+            requestAnimationFrame(gameLoop);
+        }
+    </script>
 </body>
 
 </html>
