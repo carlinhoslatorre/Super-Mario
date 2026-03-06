@@ -35,6 +35,7 @@ class Game {
     constructor() {
         this.canvas = document.getElementById('game-canvas');
         this.ctx = this.canvas.getContext('2d');
+        this.ctx.imageSmoothingEnabled = false;
 
         this.coins = 0;
         this.score = 0;
@@ -79,7 +80,12 @@ class Game {
     }
 
     setupEventListeners() {
-        window.addEventListener('keydown', (e) => this.keys[e.code] = true);
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', 'KeyA', 'KeyD', 'KeyW', 'KeyS'].includes(e.code)) {
+                e.preventDefault();
+            }
+            this.keys[e.code] = true;
+        });
         window.addEventListener('keyup', (e) => this.keys[e.code] = false);
 
         document.getElementById('start-btn').onclick = () => {

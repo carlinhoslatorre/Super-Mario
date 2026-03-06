@@ -1,7 +1,9 @@
 :root {
-    --primary-color: #ff3e3e; /* Mario Red */
+    --primary-color: #ff3e3e;
+    /* Mario Red */
     --secondary-color: #2e2e2e;
-    --accent-color: #ff9900; /* Star power */
+    --accent-color: #ff9900;
+    /* Star power */
     --bg-color: #121212;
     --text-color: #e0e0e0;
     --font-heading: 'Press Start 2P', cursive;
@@ -29,7 +31,8 @@ body {
 
 #game-container {
     width: 800px;
-    height: 720px; /* Header (60px) + Main (600px) + Footer (60px) */
+    height: 720px;
+    /* Header (60px) + Main (600px) + Footer (60px) */
     display: flex;
     flex-direction: column;
     border: 4px solid var(--primary-color);
@@ -81,8 +84,11 @@ main {
 
 #game-canvas {
     display: block;
-    image-rendering: pixelated; /* Essential for pixel art */
-    background: linear-gradient(to bottom, #5c94fc, #9290ff); /* Classic Mario sky */
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    background: linear-gradient(to bottom, #5c94fc, #9290ff);
+    /* Classic Mario sky */
 }
 
 #overlay {
@@ -174,6 +180,13 @@ footer p {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
