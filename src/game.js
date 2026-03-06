@@ -47,6 +47,7 @@ class Game {
         this.entities = [];
         this.player = null;
         this.camera = { x: 0, y: 0 };
+        this.invincibleTimer = 0;
 
         this.images = {};
         this.keys = {};
@@ -123,7 +124,8 @@ class Game {
         this.hiddenBlocks = [];
         this.fallingPlatforms = [];
 
-        this.player = new Player(64, 250, this);
+        this.player = new Player(100, 150, this);
+        this.invincibleTimer = 120; // 2 seconds safety
         this.entities = [
             new Enemy(800, 320, this),
             new Enemy(1400, 320, this),
@@ -133,6 +135,7 @@ class Game {
 
     update() {
         if (this.isPaused || this.isGameOver) return;
+        if (this.invincibleTimer > 0) this.invincibleTimer--;
 
         // Gravity flip timer logic
         if (this.isGravityFlipped) {
@@ -224,6 +227,7 @@ class Game {
     }
 
     gameOver() {
+        if (this.invincibleTimer > 0) return;
         this.isGameOver = true;
         document.getElementById('final-score').innerText = this.score;
         document.getElementById('game-over-screen').classList.remove('hidden');
