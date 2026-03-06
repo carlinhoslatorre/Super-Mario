@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,10 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <div id="game-container">
         <header>
@@ -22,21 +25,21 @@
 
         <main>
             <canvas id="game-canvas" width="800" height="600"></canvas>
-            
+
             <div id="overlay">
                 <div id="start-screen" class="screen">
-                    <h2>WELCOME TO THE CHAOS</h2>
-                    <p>Gravity is failing. Can you survive the Mushroom Kingdom's glitch?</p>
-                    <button id="start-btn" class="pixel-btn">START GAME</button>
+                    <h2>MARIO: GRAVITY CHAOS</h2>
+                    <p>Use WASD or Arrows to move. Space to jump.</p>
+                    <button id="start-btn" class="pixel-btn">CLICK TO START</button>
                     <div class="controls-hint">
                         <span>[A/D/ARROWS] Move</span>
-                        <span>[W/SPACE] Jump</span>
+                        <span>[SPACE/W] Jump</span>
                     </div>
                 </div>
 
                 <div id="game-over-screen" class="screen hidden">
-                    <h2>CHAOS RECLAIMED</h2>
-                    <p>Your scores: <span id="final-score">0</span></p>
+                    <h2>GAME OVER</h2>
+                    <p>Total Score: <span id="final-score">0</span></p>
                     <button id="restart-btn" class="pixel-btn">RETRY</button>
                 </div>
             </div>
@@ -47,6 +50,8 @@
         </footer>
     </div>
 
-    <script src="src/game.js" type="module"></script>
+    <!-- Removed module type for better control and event handling -->
+    <script src="src/game.js"></script>
 </body>
+
 </html>
