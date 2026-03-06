@@ -16,7 +16,8 @@ const CONFIG = {
     tile: 32,
     gravity: 0.6,
     jump: -12,
-    speed: 5
+    speed: 5,
+    safePeriod: 180 // 3 seconds of absolute safety at start
 };
 
 class Game {
@@ -138,19 +139,21 @@ class Game {
 
     reset() {
         this.player = {
-            x: 100, y: 300, vx: 0, vy: 0,
+            x: 64, y: 400, vx: 0, vy: 0,
             w: 24, h: 30, ground: false, facing: 1,
             isBig: false, powerTimer: 0
         };
         this.camera = 0;
-        this.invincible = 60;
+        this.invincible = CONFIG.safePeriod;
         this.items = [];
-        this.enemies = [{ x: 800, y: 512, vx: -2 }];
+        this.enemies = [{ x: 1000, y: 512, vx: -2 }];
 
         // Map Generation
         this.blocks = [];
         // Ground
-        for (let i = 0; i < 150; i++) this.blocks.push({ x: i * 32, y: 544, type: 'floor' });
+        for (let i = 0; i < 150; i++) {
+            this.blocks.push({ x: i * 32, y: 544, w: 32, h: 32, type: 'floor' });
+        }
 
         // Sample Bricks and Q-Boxes
         this.addBlock(200, 400, 'qbox', 'mushroom');
@@ -323,12 +326,14 @@ class Game {
     }
 
     loseLife() {
+        if (this.invincible > 60) return; // Prevent losing life if just started
         this.lives--;
         if (this.lives <= 0) {
             this.isGameOver = true;
             this.showOverlay("GAME OVER");
         } else {
             this.reset();
+            this.invincible = CONFIG.safePeriod; // Full safety on respawn
         }
     }
 
