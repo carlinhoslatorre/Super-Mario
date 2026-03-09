@@ -1,88 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
-    <title>Mario Gravity Chaos</title>
-    <style>
-        body {
-            background: #000;
-            color: #fff;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        #start-btn {
-            padding: 20px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        canvas {
-            border: 2px solid #ff0000;
-            background: #5c94fc;
-            display: none;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Mario: Gravity Chaos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <button id="start-btn">CLIQUE PARA JOGAR (START)</button>
-    <canvas id="game-canvas"></canvas>
+    <div id="game-container">
+        <!-- HUD Superior -->
+        <div id="hud">
+            <div class="hud-item">
+                <span class="label">MARIO</span><br>
+                <span id="score">000000</span>
+            </div>
+            <div class="hud-item">
+                <span class="label">COINS</span><br>
+                <span>x<span id="coin-count">00</span></span>
+            </div>
+            <div class="hud-item">
+                <span class="label">GRAVITY</span><br>
+                <span id="gravity-status">NORMAL</span>
+            </div>
+        </div>
 
-    <script>
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-        const btn = document.getElementById('start-btn');
+        <canvas id="game-canvas"></canvas>
 
-        canvas.width = 800;
-        canvas.height = 600;
+        <!-- Overlays -->
+        <div id="overlay">
+            <div id="start-screen" class="screen">
+                <h1>SUPER MARIO</h1>
+                <p>GRAVITY CHAOS</p>
+                <button id="start-btn" class="pixel-btn">START GAME</button>
+                <div class="controls-hint">
+                    ARROWS/WASD: Move & Jump<br>
+                    SHIFT/F: Shoot (Fire Mario)<br>
+                    SPACE: Gravity Chaos (Special)
+                </div>
+            </div>
 
-        let player = { x: 100, y: 500, vx: 0, vy: 0, w: 32, h: 32 };
-        let gravity = 0.5;
-        let keys = {};
+            <div id="game-over-screen" class="screen hidden">
+                <h1>GAME OVER</h1>
+                <p>Score: <span id="final-score">0</span></p>
+                <button id="restart-btn" class="pixel-btn">TRY AGAIN</button>
+            </div>
+        </div>
+    </div>
 
-        window.onkeydown = (e) => keys[e.code] = true;
-        window.onkeyup = (e) => keys[e.code] = false;
-
-        btn.onclick = () => {
-            btn.style.display = 'none';
-            canvas.style.display = 'block';
-            gameLoop();
-        };
-
-        function gameLoop() {
-            // Physics
-            if (keys['ArrowLeft'] || keys['KeyA']) player.vx = -5;
-            else if (keys['ArrowRight'] || keys['KeyD']) player.vx = 5;
-            else player.vx = 0;
-
-            if ((keys['ArrowUp'] || keys['KeyW'] || keys['Space']) && player.y >= 500) {
-                player.vy = -12;
-            }
-
-            player.y += player.vy;
-            player.x += player.vx;
-
-            if (player.y < 500) player.vy += gravity;
-            else { player.y = 500; player.vy = 0; }
-
-            // Draw
-            ctx.fillStyle = '#5c94fc';
-            ctx.fillRect(0, 0, 800, 600);
-
-            ctx.fillStyle = '#8B4513';
-            ctx.fillRect(0, 532, 800, 68);
-
-            ctx.fillStyle = 'red';
-            ctx.fillRect(player.x, player.y, player.w, player.h);
-
-            requestAnimationFrame(gameLoop);
-        }
-    </script>
+    <script src="src/game.js"></script>
 </body>
 
 </html>
