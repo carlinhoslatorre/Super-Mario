@@ -396,7 +396,7 @@ class Entity {
         for (let r = startRow; r <= endRow; r++) {
             for (let c = startCol; c <= endCol; c++) {
                 const type = this.game.map[r][c];
-                if (type >= 1 && type <= 7 && type !== 7) { // Solid tiles
+                if ((type >= 1 && type <= 6) || (type >= 8 && type <= 10)) { // Solid tiles including Pipes
                     blocks.push({ x: c * 32, y: r * 32, w: 32, h: 32, r, c });
                 } else if (type === 7 && this === this.game.player) {
                     if (this.rectIntersect(this, { x: c * 32, y: r * 32, w: 32, h: 32 })) {
@@ -434,9 +434,17 @@ class Entity {
         this.x += this.vx;
         blocks.forEach(b => {
             if (this.rectIntersect(this, b)) {
-                if (this.vx > 0) this.x = b.x - this.w;
-                else if (this.vx < 0) this.x = b.x + b.w;
-                this.vx *= -0.5; // Slight bounce or stop
+                // Better horizontal resolution: check which side of the block center the entity is on
+                const entityMid = this.x + this.w / 2;
+                const blockMid = b.x + b.w / 2;
+                
+                if (entityMid < blockMid) { // Hit from left side
+                    this.x = b.x - this.w;
+                    this.vx = Math.min(0, this.vx * -0.2);
+                } else { // Hit from right side
+                    this.x = b.x + b.w;
+                    this.vx = Math.max(0, this.vx * -0.2);
+                }
                 if (this.onCollisionWall) this.onCollisionWall();
             }
         });
