@@ -411,43 +411,47 @@ class Entity {
     }
 
     applyPhysics() {
-        const blocks = this.checkCollisions();
-
-        // Vertical
+        // 1. VERTICAL RESOLUTION
         this.y += this.vy;
         this.onGround = false;
+        
+        let blocks = this.checkCollisions();
         blocks.forEach(b => {
             if (this.rectIntersect(this, b)) {
-                if (this.vy * this.game.gravityDir > 0) { // Falling onto block
+                if (this.vy * this.game.gravityDir > 0) { // Falling towards floor
                     this.y = this.game.gravityDir === 1 ? b.y - this.h : b.y + b.h;
                     this.vy = 0;
                     this.onGround = true;
-                } else if (this.vy * this.game.gravityDir < 0) { // Hitting head
+                } else if (this.vy * this.game.gravityDir < 0) { // Hitting head on ceiling
                     this.y = this.game.gravityDir === 1 ? b.y + b.h : b.y - this.h;
-                    this.vy = 0.5 * this.game.gravityDir;
+                    this.vy = 0;
                     if (this === this.game.player) this.game.hitBlock(b.r, b.c);
                 }
             }
         });
 
-        // Horizontal
+        // 2. HORIZONTAL RESOLUTION
         this.x += this.vx;
+        // Re-check collisions after vertical resolution is finalized
+        blocks = this.checkCollisions();
         blocks.forEach(b => {
             if (this.rectIntersect(this, b)) {
-                // IMPORTANT: Only treat as a wall collision if there is significant vertical overlap.
-                // This prevents the player from getting stuck on the floor they are standing on.
+                // Check vertical overlap at the new Y position
                 const overlapY = Math.min(this.y + this.h, b.y + b.h) - Math.max(this.y, b.y);
                 
-                if (overlapY > 4) { 
+                // Only block horizontally if the block is truly in front of the entity,
+                // not just something they are standing on or hitting with their head.
+                // We use a larger buffer (8px) to allow for small clips during jumps.
+                if (overlapY > 8) { 
                     const entityMid = this.x + this.w / 2;
                     const blockMid = b.x + b.w / 2;
                     
-                    if (entityMid < blockMid) { // Hit from left side
+                    if (entityMid < blockMid) { // Hit side of block from left
                         this.x = b.x - this.w;
-                        this.vx = Math.min(0, this.vx * -0.2);
-                    } else { // Hit from right side
+                        this.vx = 0;
+                    } else { // Hit side of block from right
                         this.x = b.x + b.w;
-                        this.vx = Math.max(0, this.vx * -0.2);
+                        this.vx = 0;
                     }
                     if (this.onCollisionWall) this.onCollisionWall();
                 }
