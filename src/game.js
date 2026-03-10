@@ -134,12 +134,23 @@ class Game {
             if (c === 60) this.map[9][c] = 7; // Gravity star
 
             // Random Goombas
-            if (c > 15 && c % 20 === 0) {
+            if (c > 15 && c % 22 === 0) {
                 this.entities.push(new Goomba(c * 32, 384, this));
             }
             // Random Koopas
             if (c > 25 && c % 30 === 0) {
                 this.entities.push(new Koopa(c * 32, 384, this));
+            }
+
+            // Green Pipes with Piranha Plants (Couve-flores)
+            if (c > 20 && c % 45 === 0) {
+                this.map[12][c] = 8; // Pipe Top Left
+                this.map[12][c + 1] = 9; // Pipe Top Right
+                this.map[13][c] = 10; // Pipe Shaft
+                this.map[13][c + 1] = 10;
+
+                // Add Piranha Plant (Couve-flor) inside the pipe
+                this.entities.push(new PiranhaPlant((c * 32) + 16, 12 * 32, this));
             }
         }
 
@@ -183,6 +194,25 @@ class Game {
         this.ctx.fillStyle = '#5c94fc';
         this.ctx.fillRect(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
 
+        // Draw basic hills/clouds in background
+        this.ctx.save();
+        this.ctx.translate(-(this.camera.x * 0.3), 0);
+        this.ctx.fillStyle = '#4daa4d'; // Hills
+        for (let i = 0; i < 10; i++) {
+            this.ctx.beginPath();
+            this.ctx.arc(i * 400, 550, 150, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        this.ctx.fillStyle = 'rgba(255,255,255,0.5)'; // Clouds
+        for (let i = 0; i < 10; i++) {
+            this.ctx.beginPath();
+            this.ctx.arc(i * 500 + 100, 100, 40, 0, 6.28);
+            this.ctx.arc(i * 500 + 140, 100, 50, 0, 6.28);
+            this.ctx.arc(i * 500 + 180, 100, 40, 0, 6.28);
+            this.ctx.fill();
+        }
+        this.ctx.restore();
+
         this.ctx.save();
         this.ctx.translate(-this.camera.x, 0);
 
@@ -215,26 +245,42 @@ class Game {
                 case 3: case 4: case 5: sx = 64; break; // QBox
                 case 6: sx = 96; break; // Used
                 case 7: sx = 128; break; // Gravity Star
-                case 8: sx = 160; break; // Pipe
+                case 8: sx = 160; break; // Pipe Top Left
+                case 9: sx = 192; break; // Pipe Top Right
+                case 10: sx = 224; break; // Pipe Shaft
             }
             this.ctx.drawImage(this.images.tiles, sx, 0, 32, 32, x, y, 32, 32);
         } else {
-            // Fallback drawing
+            // Classic Block Gradients
+            let grad = this.ctx.createLinearGradient(x, y, x, y + 32);
             switch (type) {
-                case 1: this.ctx.fillStyle = '#8B4513'; break;
-                case 2: this.ctx.fillStyle = '#A52A2A'; break;
-                case 3: case 4: case 5: this.ctx.fillStyle = '#FFD700'; break;
-                case 6: this.ctx.fillStyle = '#777'; break;
-                case 7: this.ctx.fillStyle = '#fff'; break;
-                default: this.ctx.fillStyle = '#000';
+                case 1: grad.addColorStop(0, '#E0580E'); grad.addColorStop(1, '#8B4513'); break; // Floor
+                case 2: grad.addColorStop(0, '#FF7A48'); grad.addColorStop(1, '#A52A2A'); break; // Brick
+                case 3: case 4: case 5: grad.addColorStop(0, '#FFF391'); grad.addColorStop(1, '#D4A017'); break; // QBox
+                case 6: grad.addColorStop(0, '#999'); grad.addColorStop(1, '#444'); break; // Used
+                case 7: grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#ccc'); break; // Gravity Star
+                case 8: case 9: case 10: grad.addColorStop(0, '#40E040'); grad.addColorStop(1, '#006400'); break; // Pipe
             }
+            this.ctx.fillStyle = grad;
             this.ctx.fillRect(x, y, 32, 32);
-            this.ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+
+            this.ctx.strokeStyle = 'black';
+            this.ctx.lineWidth = 1;
             this.ctx.strokeRect(x, y, 32, 32);
+
+            // Inner details
+            if (type === 1 || type === 2) { // Brick/Floor texture
+                this.ctx.fillStyle = 'rgba(0,0,0,0.2)';
+                this.ctx.fillRect(x + 2, y + 26, 28, 4);
+            }
+
             if (type >= 3 && type <= 5) {
                 this.ctx.fillStyle = 'white';
-                this.ctx.font = '20px serif';
+                this.ctx.font = 'bold 20px monospace';
+                this.ctx.shadowBlur = 4;
+                this.ctx.shadowColor = 'black';
                 this.ctx.fillText('?', x + 10, y + 24);
+                this.ctx.shadowBlur = 0;
             }
         }
     }
@@ -460,11 +506,29 @@ class Player extends Entity {
             else if (this.isBig) sy = 32;
             ctx.drawImage(this.game.images.hero, 0, sy, 32, 32, -16, -16, 32, 32);
         } else {
-            ctx.fillStyle = this.isFire ? 'white' : (this.isBig ? 'red' : 'orange');
-            ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
-            // Draw eyes to make it look alive
+            // Detailed Mario Fallback
+            // Hat
+            ctx.fillStyle = this.isFire ? '#FFFFFF' : '#FF0000';
+            ctx.fillRect(-12, -16, 24, 8);
+            ctx.fillRect(0, -18, 12, 4); // Hat peak
+            // Face/Skin
+            ctx.fillStyle = '#FFCEA5';
+            ctx.fillRect(-10, -8, 20, 10);
+            // Mustache/Eyes
             ctx.fillStyle = 'black';
-            ctx.fillRect(4, -10, 4, 4);
+            ctx.fillRect(4, -6, 4, 3); // Eye
+            ctx.fillRect(2, -2, 10, 4); // Mustache
+            // Body (Overalls)
+            ctx.fillStyle = this.isFire ? '#FF0000' : '#0000FF';
+            ctx.fillRect(-12, 2, 24, 14);
+            // Shirt
+            ctx.fillStyle = this.isFire ? '#FFFFFF' : '#FF0000';
+            ctx.fillRect(-12, 2, 6, 8);
+            ctx.fillRect(6, 2, 6, 8);
+            // Shoes
+            ctx.fillStyle = '#634200';
+            ctx.fillRect(-12, 16, 10, 4);
+            ctx.fillRect(2, 16, 10, 4);
         }
         ctx.restore();
     }
@@ -601,6 +665,70 @@ class Fireball extends Entity {
         ctx.beginPath();
         ctx.arc(this.x + 6, this.y + 6, 6, 0, Math.PI * 2);
         ctx.fill();
+        // Inner Glow
+        ctx.fillStyle = 'yellow';
+        ctx.beginPath();
+        ctx.arc(this.x + 6, this.y + 6, 3, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+class PiranhaPlant extends Entity {
+    constructor(x, y, game) {
+        super(x - 16, y, game);
+        this.w = 32; this.h = 32;
+        this.startY = y;
+        this.offset = 0;
+        this.timer = 0;
+        this.dir = -1; // -1 for emerging, 1 for hiding
+    }
+    update() {
+        this.timer++;
+        // Movement cycle
+        if (this.timer % 120 === 0) this.dir = -this.dir;
+
+        if (this.timer % 120 < 60) {
+            this.offset += this.dir * 0.5;
+        }
+
+        this.offset = Math.max(-40, Math.min(0, this.offset));
+        this.y = this.startY + this.offset;
+
+        // Collision with player
+        if (!this.dead && this.rectIntersect(this, this.game.player)) {
+            if (this.game.player.invincibleTimer > 600) {
+                this.die();
+            } else if (this.game.player.invincibleTimer === 0) {
+                this.game.player.takeDamage();
+            }
+        }
+    }
+    die() { this.dead = true; this.game.score += 400; }
+    draw(ctx) {
+        ctx.save();
+        // Plant logic: green stem, red head with white spots (couve-flor style)
+        ctx.fillStyle = '#00A800';
+        ctx.fillRect(this.x + 10, this.y + 16, 12, 30); // Stem
+
+        // Head
+        ctx.fillStyle = '#FF0000';
+        ctx.beginPath();
+        ctx.ellipse(this.x + 16, this.y + 8, 16, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Mouth
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.ellipse(this.x + 16, this.y + 4, 12, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // White Spots
+        ctx.fillStyle = 'white';
+        ctx.beginPath(); ctx.arc(this.x + 8, this.y + 4, 3, 0, 6.28); ctx.fill();
+        ctx.beginPath(); ctx.arc(this.x + 24, this.y + 10, 4, 0, 6.28); ctx.fill();
+        ctx.beginPath(); ctx.arc(this.x + 12, this.y + 12, 2, 0, 6.28); ctx.fill();
+
+        ctx.restore();
     }
 }
 
