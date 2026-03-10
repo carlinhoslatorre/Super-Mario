@@ -55,13 +55,25 @@ body {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--glass-border);
-    padding: 12px 20px;
+    padding: 10px 18px;
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
     min-width: 140px;
+}
+
+.portrait-hud {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.hud-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .hud-item .label {
@@ -125,6 +137,25 @@ body {
     font-size: 1.5rem;
     margin-bottom: 30px;
     letter-spacing: 5px;
+}
+
+#mario-mascot-container {
+    margin: 20px auto;
+    width: 120px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+#mario-mascot-container:hover {
+    transform: scale(1.1);
+}
+
+#mario-mascot {
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
 }
 
 .pixel-btn {

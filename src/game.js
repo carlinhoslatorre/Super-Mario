@@ -575,99 +575,8 @@ class Player extends Entity {
             ctx.shadowColor = colors[Math.floor(Date.now() / 100) % colors.length];
         }
 
-        ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
-        if (this.facing === -1) ctx.scale(-1, 1);
-        if (this.game.gravityDir === -1) ctx.scale(1, -1);
-
-        if (true) { // Using Premium Procedural Drawing as primary to ensure updates show up
-            // PREMIUM Mario Canvas Drawing (Fallback that looks like the 3D render)
-            const mainColor = this.isFire ? '#FFFFFF' : '#FF3131';
-            const accentColor = this.isFire ? '#FF3131' : '#3B82F6';
-            const skinColor = '#FFCEA5';
-
-            // Shoes (Brown)
-            ctx.fillStyle = '#543310';
-            ctx.beginPath();
-            ctx.ellipse(-8, 14, 8, 4, 0, 0, Math.PI * 2);
-            ctx.ellipse(8, 14, 8, 4, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Overalls
-            ctx.fillStyle = accentColor;
-            ctx.beginPath();
-            ctx.roundRect(-12, -4, 24, 20, 6);
-            ctx.fill();
-
-            // Overalls Straps
-            ctx.fillRect(-11, -8, 5, 8);
-            ctx.fillRect(6, -8, 5, 8);
-
-            // Buttons
-            ctx.fillStyle = '#FACC15';
-            ctx.beginPath();
-            ctx.arc(-7, 0, 2.5, 0, Math.PI * 2);
-            ctx.arc(7, 0, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Shirt
-            ctx.fillStyle = mainColor;
-            ctx.beginPath();
-            ctx.roundRect(-10, -10, 20, 6, 2); // Body part
-            ctx.fill();
-            // Arms
-            ctx.fillRect(-14, -8, 6, 8);
-            ctx.fillRect(8, -8, 6, 8);
-
-            // Gloves
-            ctx.fillStyle = 'white';
-            ctx.shadowBlur = 4;
-            ctx.shadowColor = 'rgba(0,0,0,0.2)';
-            ctx.beginPath();
-            ctx.arc(-14, 2, 5, 0, Math.PI * 2);
-            ctx.arc(14, 2, 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            // Head
-            ctx.fillStyle = skinColor;
-            ctx.beginPath();
-            ctx.arc(0, -18, 12, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Nose
-            ctx.beginPath();
-            ctx.ellipse(3, -16, 5, 4, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Mustache & Hair
-            ctx.fillStyle = '#3E2723';
-            ctx.beginPath();
-            ctx.ellipse(0, -13, 8, 3, 0, 0, Math.PI * 2); // Mustache
-            ctx.fill();
-            ctx.fillRect(-14, -20, 4, 8); // Sideburn
-
-            // Eyes
-            ctx.fillStyle = 'white';
-            ctx.beginPath(); ctx.ellipse(4, -21, 3, 5, 0, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#3B82F6';
-            ctx.beginPath(); ctx.arc(5, -20, 2, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = 'black';
-            ctx.beginPath(); ctx.arc(5, -20, 1, 0, Math.PI * 2); ctx.fill();
-
-            // Hat
-            ctx.fillStyle = mainColor;
-            ctx.beginPath();
-            ctx.ellipse(0, -25, 14, 8, 0, Math.PI, Math.PI * 2); // Top
-            ctx.fill();
-            ctx.fillRect(0, -26, 14, 4); // Peak
-
-            // 'M' Symbol
-            ctx.fillStyle = 'white';
-            ctx.beginPath(); ctx.arc(0, -26, 4, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = '#FF3131';
-            ctx.font = 'bold 6px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('M', 0, -24);
+        if (true) {
+            DrawUtils.drawPremiumMario(ctx, this.x + this.w / 2, this.y + this.h / 2, 1, this.isFire, this.facing, this.game.gravityDir);
         }
         ctx.restore();
     }
@@ -918,4 +827,114 @@ class PiranhaPlant extends Entity {
     }
 }
 
-window.onload = () => { new Game(); };
+// --- UTILITIES ---
+class DrawUtils {
+    static drawPremiumMario(ctx, x, y, scale = 1, isFire = false, facing = 1, gravityDir = 1) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale * facing, scale * gravityDir);
+        
+        const mainColor = isFire ? '#FFFFFF' : '#FF3131';
+        const accentColor = isFire ? '#FF3131' : '#3B82F6';
+        const skinColor = '#FFCEA5';
+
+        // Shoes
+        ctx.fillStyle = '#543310';
+        ctx.beginPath();
+        ctx.ellipse(-8, 14, 8, 4, 0, 0, Math.PI * 2);
+        ctx.ellipse(8, 14, 8, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Overalls
+        ctx.fillStyle = accentColor;
+        ctx.beginPath();
+        ctx.roundRect(-12, -4, 24, 20, 6);
+        ctx.fill();
+
+        // Straps & Buttons
+        ctx.fillRect(-11, -8, 5, 8);
+        ctx.fillRect(6, -8, 5, 8);
+        ctx.fillStyle = '#FACC15';
+        ctx.beginPath();
+        ctx.arc(-7, 0, 2.5, 0, Math.PI * 2);
+        ctx.arc(7, 0, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Shirt & Arms
+        ctx.fillStyle = mainColor;
+        ctx.beginPath();
+        ctx.roundRect(-10, -10, 20, 6, 2);
+        ctx.fill();
+        ctx.fillRect(-14, -8, 6, 8);
+        ctx.fillRect(8, -8, 6, 8);
+
+        // Gloves
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(-14, 2, 5, 0, Math.PI * 2);
+        ctx.arc(14, 2, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Head & Nose
+        ctx.fillStyle = skinColor;
+        ctx.beginPath(); ctx.arc(0, -18, 12, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(3, -16, 5, 4, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Hair & Mustache
+        ctx.fillStyle = '#3E2723';
+        ctx.beginPath(); ctx.ellipse(0, -13, 8, 3, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillRect(-14, -20, 4, 8);
+
+        // Eyes
+        ctx.fillStyle = 'white';
+        ctx.beginPath(); ctx.ellipse(4, -21, 3, 5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#3B82F6';
+        ctx.beginPath(); ctx.arc(5, -20, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'black';
+        ctx.beginPath(); ctx.arc(5, -20, 1, 0, Math.PI * 2); ctx.fill();
+
+        // Hat
+        ctx.fillStyle = mainColor;
+        ctx.beginPath(); ctx.ellipse(0, -25, 14, 8, 0, Math.PI, Math.PI * 2); ctx.fill();
+        ctx.fillRect(0, -26, 14, 4);
+        ctx.fillStyle = 'white';
+        ctx.beginPath(); ctx.arc(0, -26, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#FF3131';
+        ctx.font = 'bold 6px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('M', 0, -24);
+
+        ctx.restore();
+    }
+}
+
+// Start Screen & HUD Mascot Logic
+window.addEventListener('load', () => {
+    // 1. Initial Start Screen Mascot
+    const mascotCanvas = document.getElementById('mario-mascot');
+    if (mascotCanvas) {
+        const mctx = mascotCanvas.getContext('2d');
+        const drawMascot = (t) => {
+            mctx.clearRect(0, 0, mascotCanvas.width, mascotCanvas.height);
+            const bounce = Math.sin(t * 0.005) * 8;
+            DrawUtils.drawPremiumMario(mctx, 50, 70 + bounce, 2.5);
+            requestAnimationFrame(drawMascot);
+        };
+        drawMascot(0);
+    }
+
+    // 2. HUD Portrait Icon (Static but updated)
+    const portraitCanvas = document.getElementById('mario-portrait');
+    if (portraitCanvas) {
+        const pctx = portraitCanvas.getContext('2d');
+        const drawHUDIcon = (t) => {
+            pctx.clearRect(0, 0, 40, 40);
+            const breathe = Math.sin(t * 0.005) * 1.5;
+            DrawUtils.drawPremiumMario(pctx, 20, 25 + breathe, 1);
+            requestAnimationFrame(drawHUDIcon);
+        };
+        drawHUDIcon(0);
+    }
+    
+    new Game();
+});
