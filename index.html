@@ -53,7 +53,12 @@
         </div>
     </div>
 
-    <script src="src/game.js"></script>
+    <script>
+        // Force refresh script to avoid caching issues with new character designs
+        const script = document.createElement('script');
+        script.src = 'src/game.js?v=' + Date.now();
+        document.body.appendChild(script);
+    </script>
 </body>
 
 </html>

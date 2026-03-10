@@ -579,12 +579,7 @@ class Player extends Entity {
         if (this.facing === -1) ctx.scale(-1, 1);
         if (this.game.gravityDir === -1) ctx.scale(1, -1);
 
-        if (this.game.images.hero) {
-            let sy = 0;
-            if (this.isFire) sy = 64;
-            else if (this.isBig) sy = 32;
-            ctx.drawImage(this.game.images.hero, 0, sy, 32, 32, -18, -18, 36, 36);
-        } else {
+        if (true) { // Using Premium Procedural Drawing as primary to ensure updates show up
             // PREMIUM Mario Canvas Drawing (Fallback that looks like the 3D render)
             const mainColor = this.isFire ? '#FFFFFF' : '#FF3131';
             const accentColor = this.isFire ? '#FF3131' : '#3B82F6';
@@ -693,9 +688,7 @@ class Goomba extends Entity {
         ctx.save();
         ctx.translate(Math.floor(this.x + 16), Math.floor(this.y + 16));
         
-        if (this.game.images.enemies && this.game.images.enemies.width > 32) {
-            ctx.drawImage(this.game.images.enemies, 0, 0, 32, 32, -16, -16, 32, 32);
-        } else {
+        if (true) { // Priority for premium procedural drawing
             // PREMIUM Goomba Canvas Drawing
             const capColor = '#8D5524';
             const skinColor = '#FFCEA5';
