@@ -115,43 +115,43 @@ class Game {
         // 0=Empty, 1=Floor, 2=Brick, 3=Q-Coin, 4=Q-Mushroom/Flower, 5=Q-Star, 6=Used-Block, 7=Gravity-Star, 8=Pipe
         this.map = Array(15).fill(0).map(() => Array(200).fill(0));
 
-        // Fill base floor
+        // Decorative scenery (Hills and Bushes)
+        this.scenery = [];
+        for (let i = 0; i < 40; i++) {
+            this.scenery.push({
+                x: i * 350 + Math.random() * 200,
+                type: Math.random() > 0.4 ? 'hill' : 'bush',
+                scale: 0.8 + Math.random() * 0.4
+            });
+        }
+
         for (let c = 0; c < 200; c++) {
-            this.map[14][c] = 1;
-            this.map[13][c] = 1;
-
-            // Add platforms and blocks
-            if (c > 10 && c % 12 === 0) {
-                this.map[9][c] = 2;
-                this.map[9][c + 1] = 4; // Mushroom/Flower
-                this.map[9][c + 2] = 2;
-            }
-            if (c > 20 && c % 15 === 0) {
-                this.map[10][c] = 3; // Coin box
-                this.map[10][c + 1] = 3;
-            }
-            if (c === 40) this.map[9][c] = 5; // Star box
-            if (c === 60) this.map[9][c] = 7; // Gravity star
-
-            // Random Goombas
-            if (c > 15 && c % 22 === 0) {
-                this.entities.push(new Goomba(c * 32, 384, this));
-            }
-            // Random Koopas
-            if (c > 25 && c % 30 === 0) {
-                this.entities.push(new Koopa(c * 32, 384, this));
+            // FLOOR
+            if (!(c >= 70 && c <= 72) && !(c >= 130 && c <= 134)) {
+                this.map[14][c] = 1;
+                this.map[13][c] = 1;
             }
 
-            // Green Pipes with Piranha Plants (Couve-flores)
-            if (c > 20 && c % 45 === 0) {
-                this.map[12][c] = 8; // Pipe Top Left
-                this.map[12][c + 1] = 9; // Pipe Top Right
-                this.map[13][c] = 10; // Pipe Shaft
-                this.map[13][c + 1] = 10;
+            // PATTERN INSPIRED BY THE IMAGE
+            if (c === 18) this.map[9][c] = 2; // Lone brick
+            if (c >= 22 && c <= 25) {
+                if (c === 23) this.map[9][c] = 4; // ? Block
+                else this.map[9][c] = 2; // Bricks
+            }
+            if (c === 23) this.map[5][c] = 3; // Lone ? high up
 
-                // Add Piranha Plant (Couve-flor) inside the pipe
+            // Pipe
+            if (c === 32) {
+                this.map[12][c] = 8; this.map[12][c+1] = 9;
+                this.map[13][c] = 10; this.map[13][c+1] = 10;
                 this.entities.push(new PiranhaPlant((c * 32) + 16, 12 * 32, this));
             }
+
+            // General Gameplay elements
+            if (c > 45 && c % 18 === 0) {
+                this.entities.push(new Goomba(c * 32, 384, this));
+            }
+            if (c === 60) this.map[9][c] = 7; // Gravity Star Box
         }
 
         this.player = new Player(100, 300, this);
@@ -197,32 +197,51 @@ class Game {
         this.ctx.fillStyle = skyGrad;
         this.ctx.fillRect(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
 
-        // Draw basic hills/clouds in background
-        this.ctx.save();
-        this.ctx.translate(-(this.camera.x * 0.2), 0);
-        
-        // Hills with gradients
-        for (let i = 0; i < 15; i++) {
-            let hillX = i * 350;
-            let hillGrad = this.ctx.createLinearGradient(hillX, 400, hillX, 600);
-            hillGrad.addColorStop(0, '#10B981');
-            hillGrad.addColorStop(1, '#059669');
-            this.ctx.fillStyle = hillGrad;
-            this.ctx.beginPath();
-            this.ctx.ellipse(hillX, 580, 200, 250, 0, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
+        // Draw Scenery (Hills and Bushes)
+        this.scenery.forEach(s => {
+            let sx = s.x - (this.camera.x * 0.4);
+            this.ctx.save();
+            this.ctx.translate(sx, 416); // Anchored to ground
+            this.ctx.scale(s.scale, s.scale);
+            
+            if (s.type === 'hill') {
+                // Classic Green Hill with dots
+                this.ctx.fillStyle = '#22c55e';
+                this.ctx.beginPath();
+                this.ctx.ellipse(0, 0, 60, 80, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.strokeStyle = '#14532d';
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+                // Dots
+                this.ctx.fillStyle = '#14532d';
+                this.ctx.beginPath(); this.ctx.arc(-10, -20, 3, 0, 6.28); this.ctx.fill();
+                this.ctx.beginPath(); this.ctx.arc(15, -10, 3, 0, 6.28); this.ctx.fill();
+            } else {
+                // Bush
+                this.ctx.fillStyle = '#4ade80';
+                this.ctx.beginPath();
+                this.ctx.arc(-20, 0, 20, 0, 6.28);
+                this.ctx.arc(0, -10, 25, 0, 6.28);
+                this.ctx.arc(20, 0, 20, 0, 6.28);
+                this.ctx.fill();
+                this.ctx.strokeStyle = '#166534';
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+            }
+            this.ctx.restore();
+        });
 
         // Animated Clouds
         this.ctx.fillStyle = 'rgba(255,255,255,0.7)';
         const time = Date.now() * 0.001;
         for (let i = 0; i < 10; i++) {
-            let cx = (i * 500 + time * 20) % (CONFIG.canvasWidth + 600) - 300;
-            let cy = 100 + Math.sin(time + i) * 20;
+            let cx = (i * 600 + time * 30) % (CONFIG.canvasWidth + 800) - 400;
+            let cy = 80 + Math.sin(time + i) * 15;
             this.ctx.beginPath();
-            this.ctx.arc(cx, cy, 30, 0, 6.28);
-            this.ctx.arc(cx + 35, cy - 10, 40, 0, 6.28);
-            this.ctx.arc(cx + 70, cy, 30, 0, 6.28);
+            this.ctx.arc(cx, cy, 25, 0, 6.28);
+            this.ctx.arc(cx + 30, cy - 10, 35, 0, 6.28);
+            this.ctx.arc(cx + 60, cy, 25, 0, 6.28);
             this.ctx.fill();
         }
         this.ctx.restore();
@@ -251,52 +270,54 @@ class Game {
     }
 
     drawTile(type, x, y) {
-        if (this.images.tiles) {
-            let sx = 0;
-            switch (type) {
-                case 1: sx = 0; break; // Floor
-                case 2: sx = 32; break; // Brick
-                case 3: case 4: case 5: sx = 64; break; // QBox
-                case 6: sx = 96; break; // Used
-                case 7: sx = 128; break; // Gravity Star
-                case 8: sx = 160; break; // Pipe Top Left
-                case 9: sx = 192; break; // Pipe Top Right
-                case 10: sx = 224; break; // Pipe Shaft
-            }
-            this.ctx.drawImage(this.images.tiles, sx, 0, 32, 32, x, y, 32, 32);
-        } else {
-            // Classic Block Gradients
-            let grad = this.ctx.createLinearGradient(x, y, x, y + 32);
-            switch (type) {
-                case 1: grad.addColorStop(0, '#E0580E'); grad.addColorStop(1, '#8B4513'); break; // Floor
-                case 2: grad.addColorStop(0, '#FF7A48'); grad.addColorStop(1, '#A52A2A'); break; // Brick
-                case 3: case 4: case 5: grad.addColorStop(0, '#FFF391'); grad.addColorStop(1, '#D4A017'); break; // QBox
-                case 6: grad.addColorStop(0, '#999'); grad.addColorStop(1, '#444'); break; // Used
-                case 7: grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#ccc'); break; // Gravity Star
-                case 8: case 9: case 10: grad.addColorStop(0, '#40E040'); grad.addColorStop(1, '#006400'); break; // Pipe
-            }
-            this.ctx.fillStyle = grad;
-            this.ctx.fillRect(x, y, 32, 32);
-
-            this.ctx.strokeStyle = 'black';
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeRect(x, y, 32, 32);
-
-            // Inner details
-            if (type === 1 || type === 2) { // Brick/Floor texture
-                this.ctx.fillStyle = 'rgba(0,0,0,0.2)';
-                this.ctx.fillRect(x + 2, y + 26, 28, 4);
-            }
-
-            if (type >= 3 && type <= 5) {
-                this.ctx.fillStyle = 'white';
-                this.ctx.font = 'bold 20px monospace';
-                this.ctx.shadowBlur = 4;
-                this.ctx.shadowColor = 'black';
-                this.ctx.fillText('?', x + 10, y + 24);
-                this.ctx.shadowBlur = 0;
-            }
+        this.ctx.save();
+        switch (type) {
+            case 1: // Floor (Brown with detail)
+                this.ctx.fillStyle = '#924E00';
+                this.ctx.fillRect(x, y, 32, 32);
+                this.ctx.fillStyle = '#4B2800';
+                this.ctx.fillRect(x, y + 28, 32, 4); // Shadow
+                this.ctx.fillRect(x + 28, y, 4, 32); // Right shadow
+                this.ctx.fillStyle = '#C06600';
+                this.ctx.fillRect(x, y, 32, 4); // Highlight
+                break;
+            case 2: // Bricks (Segmented)
+                this.ctx.fillStyle = '#C84C0C';
+                this.ctx.fillRect(x, y, 32, 32);
+                this.ctx.strokeStyle = '#4B2800';
+                this.ctx.lineWidth = 1;
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, y + 16); this.ctx.lineTo(x + 32, y + 16);
+                this.ctx.moveTo(x + 16, y); this.ctx.lineTo(x + 16, y + 16);
+                this.ctx.moveTo(x + 8, y + 16); this.ctx.lineTo(x + 8, y + 32);
+                this.ctx.moveTo(x + 24, y + 16); this.ctx.lineTo(x + 24, y + 32);
+                this.ctx.stroke();
+                break;
+            case 3: case 4: case 5: // Q-Box (Yellow)
+                this.ctx.fillStyle = '#FFCC00';
+                this.ctx.fillRect(x, y, 32, 32);
+                this.ctx.strokeStyle = '#000';
+                this.ctx.strokeRect(x+1, y+1, 30, 30);
+                this.ctx.fillStyle = '#000';
+                this.ctx.font = 'bold 20px "Press Start 2P"';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('?', x + 16, y + 25);
+                break;
+            case 6: // Used Block
+                this.ctx.fillStyle = '#7d7d7d';
+                this.ctx.fillRect(x, y, 32, 32);
+                this.ctx.strokeRect(x, y, 32, 32);
+                break;
+            case 8: case 9: case 10: // Pipe
+                this.ctx.fillStyle = '#00A800';
+                this.ctx.fillRect(x, y, 32, 32);
+                this.ctx.strokeRect(x, y, 32, 32);
+                break;
+            default:
+                this.ctx.fillStyle = '#fff';
+                this.ctx.fillRect(x, y, 32, 32);
         }
+        this.ctx.restore();
     }
 
     gameOver() {
