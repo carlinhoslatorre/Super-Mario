@@ -434,18 +434,23 @@ class Entity {
         this.x += this.vx;
         blocks.forEach(b => {
             if (this.rectIntersect(this, b)) {
-                // Better horizontal resolution: check which side of the block center the entity is on
-                const entityMid = this.x + this.w / 2;
-                const blockMid = b.x + b.w / 2;
+                // IMPORTANT: Only treat as a wall collision if there is significant vertical overlap.
+                // This prevents the player from getting stuck on the floor they are standing on.
+                const overlapY = Math.min(this.y + this.h, b.y + b.h) - Math.max(this.y, b.y);
                 
-                if (entityMid < blockMid) { // Hit from left side
-                    this.x = b.x - this.w;
-                    this.vx = Math.min(0, this.vx * -0.2);
-                } else { // Hit from right side
-                    this.x = b.x + b.w;
-                    this.vx = Math.max(0, this.vx * -0.2);
+                if (overlapY > 4) { 
+                    const entityMid = this.x + this.w / 2;
+                    const blockMid = b.x + b.w / 2;
+                    
+                    if (entityMid < blockMid) { // Hit from left side
+                        this.x = b.x - this.w;
+                        this.vx = Math.min(0, this.vx * -0.2);
+                    } else { // Hit from right side
+                        this.x = b.x + b.w;
+                        this.vx = Math.max(0, this.vx * -0.2);
+                    }
+                    if (this.onCollisionWall) this.onCollisionWall();
                 }
-                if (this.onCollisionWall) this.onCollisionWall();
             }
         });
     }
