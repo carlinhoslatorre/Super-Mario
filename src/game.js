@@ -190,25 +190,39 @@ class Game {
     draw() {
         this.ctx.clearRect(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
 
-        // Sky background
-        this.ctx.fillStyle = '#5c94fc';
+        // Sky background gradient
+        let skyGrad = this.ctx.createLinearGradient(0, 0, 0, CONFIG.canvasHeight);
+        skyGrad.addColorStop(0, '#0EA5E9');
+        skyGrad.addColorStop(1, '#38BDF8');
+        this.ctx.fillStyle = skyGrad;
         this.ctx.fillRect(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
 
         // Draw basic hills/clouds in background
         this.ctx.save();
-        this.ctx.translate(-(this.camera.x * 0.3), 0);
-        this.ctx.fillStyle = '#4daa4d'; // Hills
-        for (let i = 0; i < 10; i++) {
+        this.ctx.translate(-(this.camera.x * 0.2), 0);
+        
+        // Hills with gradients
+        for (let i = 0; i < 15; i++) {
+            let hillX = i * 350;
+            let hillGrad = this.ctx.createLinearGradient(hillX, 400, hillX, 600);
+            hillGrad.addColorStop(0, '#10B981');
+            hillGrad.addColorStop(1, '#059669');
+            this.ctx.fillStyle = hillGrad;
             this.ctx.beginPath();
-            this.ctx.arc(i * 400, 550, 150, 0, Math.PI * 2);
+            this.ctx.ellipse(hillX, 580, 200, 250, 0, 0, Math.PI * 2);
             this.ctx.fill();
         }
-        this.ctx.fillStyle = 'rgba(255,255,255,0.5)'; // Clouds
+
+        // Animated Clouds
+        this.ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        const time = Date.now() * 0.001;
         for (let i = 0; i < 10; i++) {
+            let cx = (i * 500 + time * 20) % (CONFIG.canvasWidth + 600) - 300;
+            let cy = 100 + Math.sin(time + i) * 20;
             this.ctx.beginPath();
-            this.ctx.arc(i * 500 + 100, 100, 40, 0, 6.28);
-            this.ctx.arc(i * 500 + 140, 100, 50, 0, 6.28);
-            this.ctx.arc(i * 500 + 180, 100, 40, 0, 6.28);
+            this.ctx.arc(cx, cy, 30, 0, 6.28);
+            this.ctx.arc(cx + 35, cy - 10, 40, 0, 6.28);
+            this.ctx.arc(cx + 70, cy, 30, 0, 6.28);
             this.ctx.fill();
         }
         this.ctx.restore();
@@ -417,6 +431,7 @@ class Player extends Entity {
         this.isFire = false;
         this.invincibleTimer = 0;
         this.flicker = 0;
+        this.trail = [];
     }
 
     update() {
@@ -466,6 +481,18 @@ class Player extends Entity {
                 }
             }
         });
+        // Trail logic
+        if (Math.abs(this.vx) > 2 || Math.abs(this.vy) > 2) {
+            this.trail.push({ 
+                x: this.x, 
+                y: this.y, 
+                alpha: 0.4, 
+                bg: this.game.gravityDir === -1 ? '#FACC15' : 'rgba(255,255,255,0.4)' 
+            });
+        }
+        if (this.trail.length > 8) this.trail.shift();
+        this.trail.forEach(t => t.alpha -= 0.05);
+        this.trail = this.trail.filter(t => t.alpha > 0);
     }
 
     takeDamage() {
@@ -486,6 +513,20 @@ class Player extends Entity {
     }
 
     draw(ctx) {
+        // Draw trail
+        this.trail.forEach(t => {
+            ctx.save();
+            ctx.globalAlpha = t.alpha;
+            ctx.fillStyle = t.bg;
+            ctx.translate(t.x + this.w / 2, t.y + this.h / 2);
+            if (this.facing === -1) ctx.scale(-1, 1);
+            if (this.game.gravityDir === -1) ctx.scale(1, -1);
+            ctx.beginPath();
+            ctx.roundRect(-12, -16, 24, 32, 8);
+            ctx.fill();
+            ctx.restore();
+        });
+
         ctx.save();
         if (this.invincibleTimer > 0 && Math.floor(Date.now() / 50) % 2 === 0) ctx.globalAlpha = 0.5;
 
@@ -504,31 +545,96 @@ class Player extends Entity {
             let sy = 0;
             if (this.isFire) sy = 64;
             else if (this.isBig) sy = 32;
-            ctx.drawImage(this.game.images.hero, 0, sy, 32, 32, -16, -16, 32, 32);
+            ctx.drawImage(this.game.images.hero, 0, sy, 32, 32, -18, -18, 36, 36);
         } else {
-            // Detailed Mario Fallback
-            // Hat
-            ctx.fillStyle = this.isFire ? '#FFFFFF' : '#FF0000';
-            ctx.fillRect(-12, -16, 24, 8);
-            ctx.fillRect(0, -18, 12, 4); // Hat peak
-            // Face/Skin
-            ctx.fillStyle = '#FFCEA5';
-            ctx.fillRect(-10, -8, 20, 10);
-            // Mustache/Eyes
-            ctx.fillStyle = 'black';
-            ctx.fillRect(4, -6, 4, 3); // Eye
-            ctx.fillRect(2, -2, 10, 4); // Mustache
-            // Body (Overalls)
-            ctx.fillStyle = this.isFire ? '#FF0000' : '#0000FF';
-            ctx.fillRect(-12, 2, 24, 14);
+            // PREMIUM Mario Canvas Drawing (Fallback that looks like the 3D render)
+            const mainColor = this.isFire ? '#FFFFFF' : '#FF3131';
+            const accentColor = this.isFire ? '#FF3131' : '#3B82F6';
+            const skinColor = '#FFCEA5';
+
+            // Shoes (Brown)
+            ctx.fillStyle = '#543310';
+            ctx.beginPath();
+            ctx.ellipse(-8, 14, 8, 4, 0, 0, Math.PI * 2);
+            ctx.ellipse(8, 14, 8, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Overalls
+            ctx.fillStyle = accentColor;
+            ctx.beginPath();
+            ctx.roundRect(-12, -4, 24, 20, 6);
+            ctx.fill();
+
+            // Overalls Straps
+            ctx.fillRect(-11, -8, 5, 8);
+            ctx.fillRect(6, -8, 5, 8);
+
+            // Buttons
+            ctx.fillStyle = '#FACC15';
+            ctx.beginPath();
+            ctx.arc(-7, 0, 2.5, 0, Math.PI * 2);
+            ctx.arc(7, 0, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
             // Shirt
-            ctx.fillStyle = this.isFire ? '#FFFFFF' : '#FF0000';
-            ctx.fillRect(-12, 2, 6, 8);
-            ctx.fillRect(6, 2, 6, 8);
-            // Shoes
-            ctx.fillStyle = '#634200';
-            ctx.fillRect(-12, 16, 10, 4);
-            ctx.fillRect(2, 16, 10, 4);
+            ctx.fillStyle = mainColor;
+            ctx.beginPath();
+            ctx.roundRect(-10, -10, 20, 6, 2); // Body part
+            ctx.fill();
+            // Arms
+            ctx.fillRect(-14, -8, 6, 8);
+            ctx.fillRect(8, -8, 6, 8);
+
+            // Gloves
+            ctx.fillStyle = 'white';
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.beginPath();
+            ctx.arc(-14, 2, 5, 0, Math.PI * 2);
+            ctx.arc(14, 2, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Head
+            ctx.fillStyle = skinColor;
+            ctx.beginPath();
+            ctx.arc(0, -18, 12, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Nose
+            ctx.beginPath();
+            ctx.ellipse(3, -16, 5, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mustache & Hair
+            ctx.fillStyle = '#3E2723';
+            ctx.beginPath();
+            ctx.ellipse(0, -13, 8, 3, 0, 0, Math.PI * 2); // Mustache
+            ctx.fill();
+            ctx.fillRect(-14, -20, 4, 8); // Sideburn
+
+            // Eyes
+            ctx.fillStyle = 'white';
+            ctx.beginPath(); ctx.ellipse(4, -21, 3, 5, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#3B82F6';
+            ctx.beginPath(); ctx.arc(5, -20, 2, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = 'black';
+            ctx.beginPath(); ctx.arc(5, -20, 1, 0, Math.PI * 2); ctx.fill();
+
+            // Hat
+            ctx.fillStyle = mainColor;
+            ctx.beginPath();
+            ctx.ellipse(0, -25, 14, 8, 0, Math.PI, Math.PI * 2); // Top
+            ctx.fill();
+            ctx.fillRect(0, -26, 14, 4); // Peak
+
+            // 'M' Symbol
+            ctx.fillStyle = 'white';
+            ctx.beginPath(); ctx.arc(0, -26, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#FF3131';
+            ctx.font = 'bold 6px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('M', 0, -24);
         }
         ctx.restore();
     }
