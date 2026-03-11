@@ -1,8 +1,4 @@
-/**
- * SUPER MARIO: GRAVITY CHAOS - DEFINITIVE VERSION
- * includes: Bricks, Q-Blocks, Coins, Mushrooms, Stars, Flowers, Goombas, Koopas.
- */
-
+console.log('--- RELOADING DESERT MARIO SCRIPT ---');
 const CONFIG = {
     canvasWidth: 800,
     canvasHeight: 600,
@@ -125,33 +121,64 @@ class Game {
             });
         }
 
-        for (let c = 0; c < 200; c++) {
-            // FLOOR
-            if (!(c >= 70 && c <= 72) && !(c >= 130 && c <= 134)) {
+        for (let c = 0; c < 300; c++) {
+            // FLOOR (Sand/Dirt)
+            if (!(c >= 72 && c <= 75) && !(c >= 140 && c <= 145)) {
                 this.map[14][c] = 1;
                 this.map[13][c] = 1;
             }
 
-            // PATTERN INSPIRED BY THE IMAGE
-            if (c === 18) this.map[9][c] = 2; // Lone brick
-            if (c >= 22 && c <= 25) {
-                if (c === 23) this.map[9][c] = 4; // ? Block
-                else this.map[9][c] = 2; // Bricks
+            // PATTERN INSPIRED BY THE DESERT IMAGE
+            // Pillar 1 at col 10
+            if (c === 10) {
+                this.map[12][c] = 12; this.map[11][c] = 12; this.map[10][c] = 12; this.map[9][c] = 11;
+                this.map[8][c-1] = 2; this.map[8][c] = 2; this.map[8][c+1] = 2;
             }
-            if (c === 23) this.map[5][c] = 3; // Lone ? high up
 
-            // Pipe
-            if (c === 32) {
+            // Pillar 2 at col 20 with ? blocks
+            if (c === 20) {
+                this.map[12][c] = 12; this.map[11][c] = 12; this.map[10][c] = 11;
+                this.map[9][c-1] = 3; this.map[9][c] = 3; this.map[9][c+1] = 3;
+            }
+
+            // Small sand columns (mini-pillars)
+            if (c % 15 === 5) {
+                this.map[12][c] = 13;
+                if (c % 30 === 5) this.map[11][c] = 13;
+            }
+
+            // Large Brick/Question platforms
+            if (c >= 35 && c <= 38) {
+                this.map[9][c] = (c === 36 || c === 37) ? 4 : 2;
+            }
+
+            // Pillar 3 at col 45 holding high bricks
+            if (c === 45) {
+                for (let r = 7; r <= 12; r++) this.map[r][c] = 12;
+                this.map[6][c] = 11;
+                for (let i = -2; i <= 2; i++) this.map[6][c + i] = 2;
+            }
+
+            // Pipe with Piranha
+            if (c === 55) {
                 this.map[12][c] = 8; this.map[12][c+1] = 9;
                 this.map[13][c] = 10; this.map[13][c+1] = 10;
                 this.entities.push(new PiranhaPlant((c * 32) + 16, 12 * 32, this));
             }
 
-            // General Gameplay elements
-            if (c > 45 && c % 18 === 0) {
+            // Placed Coins
+            if (c % 10 === 0 && this.map[13][c] === 1) {
+                this.map[12][c] = 14;
+            }
+            if ((c === 11 || c === 45) && this.map[9][c] === 11) {
+                 this.map[8][c] = 14;
+            }
+
+            // Enemie spawns
+            if (c > 20 && c % 25 === 0) {
                 this.entities.push(new Goomba(c * 32, 384, this));
             }
-            if (c === 60) this.map[9][c] = 7; // Gravity Star Box
+            if (c === 80) this.map[9][c] = 7; // Gravity Star Box
         }
 
         this.player = new Player(100, 300, this);
@@ -190,10 +217,10 @@ class Game {
     draw() {
         this.ctx.clearRect(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
 
-        // Sky background gradient
+        // Desert Sky background gradient
         let skyGrad = this.ctx.createLinearGradient(0, 0, 0, CONFIG.canvasHeight);
-        skyGrad.addColorStop(0, '#0EA5E9');
-        skyGrad.addColorStop(1, '#38BDF8');
+        skyGrad.addColorStop(0, '#7DD3FC');
+        skyGrad.addColorStop(1, '#E0F2FE');
         this.ctx.fillStyle = skyGrad;
         this.ctx.fillRect(0, 0, CONFIG.canvasWidth, CONFIG.canvasHeight);
 
@@ -205,28 +232,28 @@ class Game {
             this.ctx.scale(s.scale, s.scale);
             
             if (s.type === 'hill') {
-                // Classic Green Hill with dots
-                this.ctx.fillStyle = '#22c55e';
+                // Classic Desert Dune with orange detail
+                this.ctx.fillStyle = '#FB923C';
                 this.ctx.beginPath();
-                this.ctx.ellipse(0, 0, 60, 80, 0, 0, Math.PI * 2);
+                this.ctx.ellipse(0, 0, 80, 100, 0, 0, Math.PI * 2);
                 this.ctx.fill();
-                this.ctx.strokeStyle = '#14532d';
+                this.ctx.strokeStyle = '#9A3412';
                 this.ctx.lineWidth = 2;
                 this.ctx.stroke();
-                // Dots
-                this.ctx.fillStyle = '#14532d';
-                this.ctx.beginPath(); this.ctx.arc(-10, -20, 3, 0, 6.28); this.ctx.fill();
-                this.ctx.beginPath(); this.ctx.arc(15, -10, 3, 0, 6.28); this.ctx.fill();
+                // Dunes shadows
+                this.ctx.fillStyle = '#9A3412';
+                this.ctx.beginPath(); this.ctx.arc(-20, -30, 4, 0, 6.28); this.ctx.fill();
+                this.ctx.beginPath(); this.ctx.arc(25, -20, 4, 0, 6.28); this.ctx.fill();
             } else {
-                // Bush
-                this.ctx.fillStyle = '#4ade80';
+                // Desert Shrub
+                this.ctx.fillStyle = '#A8A29E';
                 this.ctx.beginPath();
-                this.ctx.arc(-20, 0, 20, 0, 6.28);
-                this.ctx.arc(0, -10, 25, 0, 6.28);
-                this.ctx.arc(20, 0, 20, 0, 6.28);
+                this.ctx.arc(-20, 0, 15, 0, 6.28);
+                this.ctx.arc(0, -10, 20, 0, 6.28);
+                this.ctx.arc(20, 0, 15, 0, 6.28);
                 this.ctx.fill();
-                this.ctx.strokeStyle = '#166534';
-                this.ctx.lineWidth = 2;
+                this.ctx.strokeStyle = '#44403C';
+                this.ctx.lineWidth = 1.5;
                 this.ctx.stroke();
             }
             this.ctx.restore();
@@ -238,11 +265,16 @@ class Game {
         for (let i = 0; i < 10; i++) {
             let cx = (i * 600 + time * 30) % (CONFIG.canvasWidth + 800) - 400;
             let cy = 80 + Math.sin(time + i) * 15;
-            this.ctx.beginPath();
             this.ctx.arc(cx, cy, 25, 0, 6.28);
             this.ctx.arc(cx + 30, cy - 10, 35, 0, 6.28);
             this.ctx.arc(cx + 60, cy, 25, 0, 6.28);
             this.ctx.fill();
+            // Smiley Faces on Clouds
+            this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            this.ctx.beginPath(); this.ctx.arc(cx + 22, cy - 5, 2, 0, 6.28); this.ctx.fill();
+            this.ctx.beginPath(); this.ctx.arc(cx + 38, cy - 5, 2, 0, 6.28); this.ctx.fill();
+            this.ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+            this.ctx.beginPath(); this.ctx.arc(cx + 30, cy + 2, 8, 0.2, Math.PI - 0.2); this.ctx.stroke();
         }
         this.ctx.restore();
 
@@ -272,13 +304,13 @@ class Game {
     drawTile(type, x, y) {
         this.ctx.save();
         switch (type) {
-            case 1: // Floor (Brown with detail)
-                this.ctx.fillStyle = '#924E00';
+            case 1: // Sand Floor (Orange/Sand)
+                this.ctx.fillStyle = '#D97706';
                 this.ctx.fillRect(x, y, 32, 32);
-                this.ctx.fillStyle = '#4B2800';
+                this.ctx.fillStyle = '#924E00';
                 this.ctx.fillRect(x, y + 28, 32, 4); // Shadow
                 this.ctx.fillRect(x + 28, y, 4, 32); // Right shadow
-                this.ctx.fillStyle = '#C06600';
+                this.ctx.fillStyle = '#F59E0B';
                 this.ctx.fillRect(x, y, 32, 4); // Highlight
                 break;
             case 2: // Bricks (Segmented)
@@ -293,15 +325,22 @@ class Game {
                 this.ctx.moveTo(x + 24, y + 16); this.ctx.lineTo(x + 24, y + 32);
                 this.ctx.stroke();
                 break;
-            case 3: case 4: case 5: // Q-Box (Yellow)
-                this.ctx.fillStyle = '#FFCC00';
+            case 3: case 4: case 5: // Q-Box (Shiny Golden)
+                let grad = this.ctx.createLinearGradient(x, y, x, y + 32);
+                grad.addColorStop(0, '#FACC15');
+                grad.addColorStop(1, '#D97706');
+                this.ctx.fillStyle = grad;
                 this.ctx.fillRect(x, y, 32, 32);
                 this.ctx.strokeStyle = '#000';
+                this.ctx.lineWidth = 1.5;
                 this.ctx.strokeRect(x+1, y+1, 30, 30);
-                this.ctx.fillStyle = '#000';
+                this.ctx.fillStyle = '#fff';
                 this.ctx.font = 'bold 20px "Press Start 2P"';
                 this.ctx.textAlign = 'center';
+                this.ctx.shadowBlur = 4;
+                this.ctx.shadowColor = 'rgba(0,0,0,0.5)';
                 this.ctx.fillText('?', x + 16, y + 25);
+                this.ctx.shadowBlur = 0;
                 break;
             case 6: // Used Block
                 this.ctx.fillStyle = '#7d7d7d';
@@ -312,6 +351,42 @@ class Game {
                 this.ctx.fillStyle = '#00A800';
                 this.ctx.fillRect(x, y, 32, 32);
                 this.ctx.strokeRect(x, y, 32, 32);
+                break;
+            case 11: // Pillar Top
+                this.ctx.fillStyle = '#FDE68A';
+                this.ctx.fillRect(x - 4, y, 40, 32);
+                this.ctx.strokeStyle = '#924E00';
+                this.ctx.strokeRect(x - 4, y, 40, 32);
+                this.ctx.strokeRect(x, y + 4, 32, 24);
+                break;
+            case 12: // Pillar Body
+                this.ctx.fillStyle = '#FEF3C7';
+                this.ctx.fillRect(x, y, 32, 32);
+                this.ctx.strokeStyle = '#924E00';
+                this.ctx.beginPath();
+                this.ctx.moveTo(x + 8, y); this.ctx.lineTo(x + 8, y + 32);
+                this.ctx.moveTo(x + 24, y); this.ctx.lineTo(x + 24, y + 32);
+                this.ctx.stroke();
+                break;
+            case 13: // Sand Block
+                this.ctx.fillStyle = '#D97706';
+                this.ctx.strokeStyle = '#4B2800';
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.roundRect(x + 8, y + 4, 16, 28, 4);
+                this.ctx.fill();
+                this.ctx.stroke();
+                break;
+            case 14: // Pickable Coin
+                this.ctx.fillStyle = '#FACC15';
+                this.ctx.beginPath();
+                this.ctx.ellipse(x + 16, y + 16, 8, 12, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.strokeStyle = '#924E00';
+                this.ctx.lineWidth = 1;
+                this.ctx.stroke();
+                this.ctx.fillStyle = '#924E00';
+                this.ctx.fillRect(x + 15, y + 8, 2, 16);
                 break;
             default:
                 this.ctx.fillStyle = '#fff';
@@ -429,6 +504,18 @@ class Entity {
                 }
             }
         });
+
+        // 1.5 Pickable Tiles Check
+        if (this === this.game.player) {
+            const r = Math.floor((this.y + this.h/2) / 32);
+            const c = Math.floor((this.x + this.w/2) / 32);
+            if (this.game.map[r] && this.game.map[r][c] === 14) {
+                this.game.map[r][c] = 0;
+                this.game.coins++;
+                this.game.score += 100;
+                this.game.updateHUD();
+            }
+        }
 
         // 2. HORIZONTAL RESOLUTION
         this.x += this.vx;
@@ -909,7 +996,7 @@ class DrawUtils {
 }
 
 // Start Screen & HUD Mascot Logic
-window.addEventListener('load', () => {
+const initApp = () => {
     // 1. Initial Start Screen Mascot
     const mascotCanvas = document.getElementById('mario-mascot');
     if (mascotCanvas) {
@@ -937,4 +1024,10 @@ window.addEventListener('load', () => {
     }
     
     new Game();
-});
+};
+
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initApp();
+} else {
+    window.addEventListener('load', initApp);
+}
